@@ -31,7 +31,7 @@ class GradlePropertiesParser {
     constructor (platformDir) {
         this._defaults = {
             // 10 seconds -> 6 seconds
-            'org.gradle.daemon': 'true',
+            'org.gradle.daemon': 'false',
 
             // to allow dex in process
             'org.gradle.jvmargs': '-Xmx2048m',

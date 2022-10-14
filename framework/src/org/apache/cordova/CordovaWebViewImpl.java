@@ -267,6 +267,8 @@ public class CordovaWebViewImpl implements CordovaWebView {
             } else {
                 LOG.e(TAG, "Error loading url " + url, e);
             }
+        } catch (Exception e) {
+            LOG.e(TAG, "Error loading url " + url + " with error on file URI exposed", e);
         }
     }
 

@@ -76,14 +76,6 @@ public class ConfigXmlParser {
             )
         );
 
-        pluginEntries.add(
-            new PluginEntry(
-                SplashScreenPlugin.PLUGIN_NAME,
-                "org.apache.cordova.SplashScreenPlugin",
-                true
-            )
-        );
-
         parse(action.getResources().getXml(id));
     }
 

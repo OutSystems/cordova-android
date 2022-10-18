@@ -20,7 +20,6 @@
 package __ID__;
 
 import android.os.Bundle;
-
 import org.apache.cordova.*;
 
 public class __ACTIVITY__ extends CordovaActivity

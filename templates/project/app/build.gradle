@@ -195,6 +195,7 @@ android {
       abortOnError false
     }
 
+    namespace cordovaConfig.PACKAGE_NAME
     buildToolsVersion cordovaConfig.BUILD_TOOLS_VERSION
 
     // This code exists for Crosswalk and other Native APIs.

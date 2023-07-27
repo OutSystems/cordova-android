@@ -87,6 +87,18 @@ function mockGetIconItem (data) {
     }, data);
 }
 
+/**
+ * Create a mock item from the getSplashScreen collection with the supplied updated data.
+ *
+ * @param {Object} data Changes to apply to the mock getSplashScreen item
+ */
+function mockGetSplashScreenItem (data) {
+    return Object.assign({}, {
+        src: undefined,
+        density: undefined
+    }, data);
+}
+
 describe('prepare', () => {
     // Rewire
     let prepare;
@@ -630,43 +642,106 @@ describe('prepare', () => {
         let preparedIcons;
         let resourceMap;
 
-        beforeEach(function () {
-            // Mocked Data
-            platformResourcesDir = PATH_RESOURCE;
-            preparedIcons = {
-                android_icons: {
-                    mdpi: mockGetIconItem({
-                        density: 'mdpi',
-                        background: 'res/icon/android/mdpi-background.png',
-                        foreground: 'res/icon/android/mdpi-foreground.png',
-                        monochrome: 'res/icon/android/mdpi-monochrome.png'
-                    })
-                },
-                default_icon: undefined
-            };
+        describe('without monochrome', () => {
+            beforeEach(function () {
+                // Mocked Data
+                platformResourcesDir = PATH_RESOURCE;
+                preparedIcons = {
+                    android_icons: {
+                        mdpi: mockGetIconItem({
+                            density: 'mdpi',
+                            background: 'res/icon/android/mdpi-background.png',
+                            foreground: 'res/icon/android/mdpi-foreground.png'
+                        })
+                    },
+                    default_icon: undefined
+                };
 
-            resourceMap = createResourceMap();
+                resourceMap = createResourceMap();
 
-            fsWriteFileSyncSpy = jasmine.createSpy('writeFileSync');
-            prepare.__set__('fs', {
-                writeFileSync: fsWriteFileSyncSpy
+                fsWriteFileSyncSpy = jasmine.createSpy('writeFileSync');
+                prepare.__set__('fs', {
+                    writeFileSync: fsWriteFileSyncSpy
+                });
+            });
+
+            it('Test#001 : Should update resource map with prepared icons.', function () {
+            // Get method for testing
+                const updateIconResourceForAdaptive = prepare.__get__('updateIconResourceForAdaptive');
+
+                // Run Test
+                const expectedModification = {};
+                expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_background.png')] = 'res/icon/android/mdpi-background.png';
+                expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_foreground.png')] = 'res/icon/android/mdpi-foreground.png';
+
+                const expected = Object.assign({}, resourceMap, expectedModification);
+                const actual = updateIconResourceForAdaptive(preparedIcons, resourceMap, platformResourcesDir);
+
+                expect(actual).toEqual(expected);
             });
         });
 
-        it('Test#001 : Should update resource map with prepared icons.', function () {
-        // Get method for testing
-            const updateIconResourceForAdaptive = prepare.__get__('updateIconResourceForAdaptive');
+        describe('with monochrome', () => {
+            beforeEach(function () {
+                // Mocked Data
+                platformResourcesDir = PATH_RESOURCE;
+                preparedIcons = {
+                    android_icons: {
+                        mdpi: mockGetIconItem({
+                            density: 'mdpi',
+                            background: 'res/icon/android/mdpi-background.png',
+                            foreground: 'res/icon/android/mdpi-foreground.png',
+                            monochrome: 'res/icon/android/mdpi-monochrome.png'
+                        })
+                    },
+                    default_icon: undefined
+                };
 
-            // Run Test
-            const expectedModification = {};
-            expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_background.png')] = 'res/icon/android/mdpi-background.png';
-            expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_foreground.png')] = 'res/icon/android/mdpi-foreground.png';
-            expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_monochrome.png')] = 'res/icon/android/mdpi-monochrome.png';
+                resourceMap = createResourceMap();
 
-            const expected = Object.assign({}, resourceMap, expectedModification);
-            const actual = updateIconResourceForAdaptive(preparedIcons, resourceMap, platformResourcesDir);
+                fsWriteFileSyncSpy = jasmine.createSpy('writeFileSync');
+                prepare.__set__('fs', {
+                    writeFileSync: fsWriteFileSyncSpy
+                });
+            });
 
-            expect(actual).toEqual(expected);
+            it('Test#002 : Should update resource map with prepared icons.', function () {
+            // Get method for testing
+                const updateIconResourceForAdaptive = prepare.__get__('updateIconResourceForAdaptive');
+
+                // Run Test
+                const expectedModification = {};
+                expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_background.png')] = 'res/icon/android/mdpi-background.png';
+                expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_foreground.png')] = 'res/icon/android/mdpi-foreground.png';
+                expectedModification[path.join(PATH_RESOURCE, 'mipmap-mdpi-v26', 'ic_launcher_monochrome.png')] = 'res/icon/android/mdpi-monochrome.png';
+
+                const expected = Object.assign({}, resourceMap, expectedModification);
+                const actual = updateIconResourceForAdaptive(preparedIcons, resourceMap, platformResourcesDir);
+
+                expect(actual).toEqual(expected);
+            });
+
+            it('Test#003 : should emit if monochrome is supplied without adaptive background', () => {
+                const updateIconResourceForAdaptive = prepare.__get__('updateIconResourceForAdaptive');
+
+                preparedIcons.android_icons.mdpi.background = undefined;
+                updateIconResourceForAdaptive(preparedIcons, resourceMap, platformResourcesDir);
+
+                const actualEmitArgs = emitSpy.calls.mostRecent().args;
+                expect(actualEmitArgs[0]).toBe('warn');
+                expect(actualEmitArgs[1]).toMatch(/Monochrome icon found but without adaptive properties./g);
+            });
+
+            it('Test#004 : should emit if monochrome is supplied without adaptive foreground', () => {
+                const updateIconResourceForAdaptive = prepare.__get__('updateIconResourceForAdaptive');
+
+                preparedIcons.android_icons.mdpi.foreground = undefined;
+                updateIconResourceForAdaptive(preparedIcons, resourceMap, platformResourcesDir);
+
+                const actualEmitArgs = emitSpy.calls.mostRecent().args;
+                expect(actualEmitArgs[0]).toBe('warn');
+                expect(actualEmitArgs[1]).toMatch(/Monochrome icon found but without adaptive properties./g);
+            });
         });
     });
 
@@ -793,9 +868,8 @@ describe('prepare', () => {
             prepare.__set__('updateWww', jasmine.createSpy());
             prepare.__set__('updateProjectAccordingTo', jasmine.createSpy('updateProjectAccordingTo')
                 .and.returnValue(Promise.resolve()));
-            prepare.__set__('warnForDeprecatedSplashScreen', jasmine.createSpy('warnForDeprecatedSplashScreen')
-                .and.returnValue(Promise.resolve()));
             prepare.__set__('updateIcons', jasmine.createSpy('updateIcons').and.returnValue(Promise.resolve()));
+            prepare.__set__('updateSplashes', jasmine.createSpy('updateSplashes').and.returnValue(Promise.resolve()));
             prepare.__set__('updateFileResources', jasmine.createSpy('updateFileResources').and.returnValue(Promise.resolve()));
             prepare.__set__('updateConfigFilesFrom',
                 jasmine.createSpy('updateConfigFilesFrom')
@@ -888,8 +962,7 @@ describe('prepare', () => {
             prepare.__set__('updateWww', jasmine.createSpy('updateWww'));
             prepare.__set__('updateIcons', jasmine.createSpy('updateIcons').and.returnValue(Promise.resolve()));
             prepare.__set__('updateProjectSplashScreen', jasmine.createSpy('updateProjectSplashScreen'));
-            prepare.__set__('warnForDeprecatedSplashScreen', jasmine.createSpy('warnForDeprecatedSplashScreen')
-                .and.returnValue(Promise.resolve()));
+            prepare.__set__('updateSplashes', jasmine.createSpy('updateSplashes').and.returnValue(Promise.resolve()));
             prepare.__set__('updateFileResources', jasmine.createSpy('updateFileResources').and.returnValue(Promise.resolve()));
             prepare.__set__('updateConfigFilesFrom',
                 jasmine.createSpy('updateConfigFilesFrom')
@@ -974,6 +1047,112 @@ describe('prepare', () => {
                 expect(copySyncSpy).toHaveBeenCalledTimes(0);
                 expect(removeSyncSpy).toHaveBeenCalledTimes(0);
             });
+        });
+    });
+
+    describe('updateSplashes method', function () {
+        // Mock Data
+        let cordovaProject;
+        let platformResourcesDir;
+
+        beforeEach(function () {
+            cordovaProject = {
+                root: '/mock',
+                projectConfig: {
+                    path: '/mock/config.xml',
+                    cdvNamespacePrefix: 'cdv'
+                },
+                locations: {
+                    plugins: '/mock/plugins',
+                    www: '/mock/www'
+                }
+            };
+            platformResourcesDir = PATH_RESOURCE;
+
+            // mocking initial responses for mapImageResources
+            prepare.__set__('makeSplashCleanupMap', (rootDir, resourcesDir) => ({
+                [path.join(resourcesDir, 'drawable-mdpi/screen.png')]: null,
+                [path.join(resourcesDir, 'drawable-mdpi/screen.webp')]: null
+            }));
+        });
+
+        it('Test#001 : Should detect no defined splash screens.', function () {
+            const updateSplashes = prepare.__get__('updateSplashes');
+
+            // mock data.
+            cordovaProject.projectConfig.getSplashScreens = function (platform) {
+                return [];
+            };
+
+            updateSplashes(cordovaProject, platformResourcesDir);
+
+            // The emit was called
+            expect(emitSpy).toHaveBeenCalled();
+
+            // The emit message was.
+            const actual = emitSpy.calls.argsFor(0)[1];
+            const expected = 'This app does not have splash screens defined';
+            expect(actual).toEqual(expected);
+        });
+
+        it('Test#02 : Should update splash png icon.', function () {
+            const updateSplashes = prepare.__get__('updateSplashes');
+
+            // mock data.
+            cordovaProject.projectConfig.getSplashScreens = function (platform) {
+                return [mockGetSplashScreenItem({
+                    density: 'mdpi',
+                    src: 'res/splash/android/mdpi-screen.png'
+                })];
+            };
+
+            updateSplashes(cordovaProject, platformResourcesDir);
+
+            // The emit was called
+            expect(emitSpy).toHaveBeenCalled();
+
+            // The emit message was.
+            const actual = emitSpy.calls.argsFor(0)[1];
+            const expected = 'Updating splash screens at ' + PATH_RESOURCE;
+            expect(actual).toEqual(expected);
+
+            const actualResourceMap = updatePathsSpy.calls.argsFor(0)[0];
+            const expectedResourceMap = {};
+            expectedResourceMap[path.join(PATH_RESOURCE, 'drawable-mdpi', 'screen.png')] = 'res/splash/android/mdpi-screen.png';
+            expectedResourceMap[path.join(PATH_RESOURCE, 'drawable-mdpi', 'screen.webp')] = null;
+
+            expect(actualResourceMap).toEqual(expectedResourceMap);
+        });
+
+        it('Test#03 : Should update splash webp icon.', function () {
+            const updateSplashes = prepare.__get__('updateSplashes');
+
+            // mock data.
+            cordovaProject.projectConfig.getSplashScreens = function (platform) {
+                return [mockGetSplashScreenItem({
+                    density: 'mdpi',
+                    src: 'res/splash/android/mdpi-screen.webp'
+                })];
+            };
+
+            // Creating Spies
+            updateSplashes(cordovaProject, platformResourcesDir);
+
+            // The emit was called
+            expect(emitSpy).toHaveBeenCalled();
+
+            // The emit message was.
+            const actual = emitSpy.calls.argsFor(0)[1];
+            const expected = 'Updating splash screens at ' + PATH_RESOURCE;
+            expect(actual).toEqual(expected);
+
+            const actualResourceMap = updatePathsSpy.calls.argsFor(0)[0];
+
+            const expectedResourceMap = {};
+            expectedResourceMap[path.join(PATH_RESOURCE, 'drawable-mdpi', 'screen.webp')] = 'res/splash/android/mdpi-screen.webp';
+            expectedResourceMap[path.join(PATH_RESOURCE, 'drawable-mdpi', 'screen.png')] = null;
+
+            expect(actualResourceMap).toEqual(expectedResourceMap);
         });
     });
 });

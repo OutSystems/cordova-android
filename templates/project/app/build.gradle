@@ -21,7 +21,6 @@ apply plugin: 'com.android.application'
 
 if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
     apply plugin: 'kotlin-android'
-    apply plugin: 'kotlin-android-extensions'
 }
 
 buildscript {

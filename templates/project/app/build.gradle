@@ -21,7 +21,6 @@ apply plugin: 'com.android.application'
 
 if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
     apply plugin: 'kotlin-android'
-    apply plugin: 'kotlin-android-extensions'
 }
 
 buildscript {
@@ -172,6 +171,7 @@ task cdvPrintProps {
         println('computedVersionCode=' + android.defaultConfig.versionCode)
         println('cdvAndroidXAppCompatVersion=' + cdvAndroidXAppCompatVersion)
         println('cdvAndroidXWebKitVersion=' + cdvAndroidXWebKitVersion)
+        println('cdvAndroidXCoreSplashscreenVersion=' + cdvAndroidXCoreSplashscreenVersion)
         android.productFlavors.each { flavor ->
             println('computed' + flavor.name.capitalize() + 'VersionCode=' + flavor.versionCode)
         }

@@ -168,6 +168,9 @@ def doApplyCordovaConfigCustomization() {
     if (project.hasProperty('cdvAndroidXWebKitVersion')) {
         cordovaConfig.ANDROIDX_WEBKIT_VERSION = cdvAndroidXWebKitVersion
     }
+    if (project.hasProperty('cdvAndroidXCoreSplashscreenVersion')) {
+        cordovaConfig.ANDROIDX_CORE_SPLASHSCREEN_VERSION = cdvAndroidXCoreSplashscreenVersion
+    }
 
     if (!cordovaConfig.BUILD_TOOLS_VERSION) {
         cordovaConfig.BUILD_TOOLS_VERSION = doFindLatestInstalledBuildTools(

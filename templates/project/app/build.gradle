@@ -252,6 +252,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
+        kotlinOptions {
+            jvmTarget = '1.8'
+        }
+    }
+
     if (cdvReleaseSigningPropertiesFile) {
         signingConfigs {
             release {

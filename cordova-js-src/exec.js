@@ -222,11 +222,7 @@ function buildPayload (payload, message) {
 // Processes a single message, as encoded by NativeToJsMessageQueue.java.
 function processMessage (message) {
     var firstChar = message.charAt(0);
-    if (firstChar === 'J') {
-        // This is deprecated on the .java side. It doesn't work with CSP enabled.
-        // eslint-disable-next-line no-eval
-        eval(message.slice(1));
-    } else if (firstChar === 'S' || firstChar === 'F') {
+    if (firstChar === 'S' || firstChar === 'F') {
         var success = firstChar === 'S';
         var keepCallback = message.charAt(1) === '1';
         var spaceIdx = message.indexOf(' ', 2);

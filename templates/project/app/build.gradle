@@ -181,6 +181,10 @@ task cdvPrintProps {
 android {
     namespace cordovaConfig.PACKAGE_NAMESPACE
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         versionCode cdvVersionCode ?: new BigInteger("" + privateHelpers.extractIntFromManifest("versionCode"))
         applicationId cordovaConfig.PACKAGE_NAMESPACE

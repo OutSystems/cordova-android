@@ -252,13 +252,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaLanguageVersion.of(cordovaConfig.JAVA_SOURCE_COMPATIBILITY)
+        targetCompatibility JavaLanguageVersion.of(cordovaConfig.JAVA_TARGET_COMPATIBILITY)
     }
 
     if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
         kotlinOptions {
-            jvmTarget = '1.8'
+            jvmTarget = cordovaConfig.KOTLIN_JVM_TARGET
         }
     }
 

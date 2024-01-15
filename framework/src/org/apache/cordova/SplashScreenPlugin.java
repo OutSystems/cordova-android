@@ -55,7 +55,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import androidx.core.util.Consumer;
 
 @SuppressLint("LongLogTag")
 public class SplashScreenPlugin extends CordovaPlugin {

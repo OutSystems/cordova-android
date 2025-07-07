@@ -39,4 +39,6 @@
         <item name="android:colorBackground">@color/cdv_background_color</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+    <color name="cdv_background_color">#FAF8FF</color>
+    <color name="cdv_splashscreen_background">@color/cdv_background_color</color>
 </resources>

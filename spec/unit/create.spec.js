@@ -283,10 +283,35 @@ describe('create', function () {
                 });
             });
 
-            it('should interpolate the escaped project name into cdv_strings.xml', () => {
+            it('should interpolate the escaped project name into strings.xml', () => {
+                var passed = true;
                 config_mock.name.and.returnValue('<Incredible&App>');
+                passed = passed && create.create(project_path, config_mock, {}, events_mock).then(() => {
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, '&lt;Incredible&amp;App&gt;');
+                });
+                config_mock.name.and.returnValue('& 12XPTO & W');
+                passed = passed && create.create(project_path, config_mock, {}, events_mock).then(() => {
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, '&amp; 12XPTO &amp; W');
+                });
+                config_mock.name.and.returnValue('Strange $ Combinaned # App &');
+                passed = passed && create.create(project_path, config_mock, {}, events_mock).then(() => {
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, 'Strange $ Combinaned # App &amp;');
+                });
+                config_mock.name.and.returnValue('$KUH% I*& $)OFNlkfn$');
+                passed = passed && create.create(project_path, config_mock, {}, events_mock).then(() => {
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, '$KUH% I*&amp; $)OFNlkfn$');
+                });
+                config_mock.name.and.returnValue('&B&B');
+                passed = passed && create.create(project_path, config_mock, {}, events_mock).then(() => {
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, '&amp;B&amp;B');
+                });
+                return passed;
+            });
+
+            it('should interpolate the project name with arabic chars into strings.xml', () => {
+                config_mock.name.and.returnValue('غظضذخثتشرقصفعسنملكيطحزوهدبأ');
                 return create.create(project_path, config_mock, {}, events_mock).then(() => {
-                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'cdv_strings.xml'), /__NAME__/, '&lt;Incredible&amp;App&gt;');
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, 'غظضذخثتشرقصفعسنملكيطحزوهدبأ');
                 });
             });
 

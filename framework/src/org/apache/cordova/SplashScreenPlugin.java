@@ -128,11 +128,11 @@ public class SplashScreenPlugin extends CordovaPlugin {
         boolean hasCustomSplashscreens = preferences.getBoolean("HasCustomSplashscreens", DEFAULT_HAS_CUSTOM_SPLASHSCREENS);
         if (!showSpinner && !hasCustomSplashscreens) {
             // Use only the Android Splashscreen API
-            behaviours.registerBehaviour(new AndroidSplashScreenBehaviour(context, autoHide, delayTime, isFadeEnabled, fadeDuration));
+            behaviours.registerBehaviour(new AndroidSplashScreenBehaviour(context, autoHide, delayTime, isFadeEnabled, fadeDuration, webView));
 
         } else {
             // Using the Android Splashscreen API is mandatory, so we'll try to use it as least as possible
-            behaviours.registerBehaviour(new AndroidSplashScreenBehaviour(context, true, 1, false, 0));
+            behaviours.registerBehaviour(new AndroidSplashScreenBehaviour(context, true, 1, false, 0, webView));
 
             // And we'll use the legacy code, from cordova-plugin-splashscreen
             Activity activity = cordova.getActivity();
@@ -237,8 +237,8 @@ public class SplashScreenPlugin extends CordovaPlugin {
 
         // Internal variables
         private boolean keepOnScreen;
-
-        public AndroidSplashScreenBehaviour(Context context, boolean autoHide, int delayTime, boolean isFadeEnabled, int fadeDuration) {
+        CordovaWebView cordovaWebView;
+        public AndroidSplashScreenBehaviour(Context context, boolean autoHide, int delayTime, boolean isFadeEnabled, int fadeDuration, CordovaWebView cordovaWebView) {
             // Context
             this.context = context;
             // Configuration variables
@@ -248,6 +248,7 @@ public class SplashScreenPlugin extends CordovaPlugin {
             this.fadeDuration = fadeDuration;
             // Internal variables
             this.keepOnScreen = true;
+            this.cordovaWebView = cordovaWebView;
         }
 
         @Override
@@ -322,11 +323,15 @@ public class SplashScreenPlugin extends CordovaPlugin {
                                     public void onAnimationEnd(Animator animation) {
                                         super.onAnimationEnd(animation);
                                         splashScreenViewProvider.remove();
+                                        cordovaWebView.getPluginManager().postMessage("updateSystemBars", null);
                                     }
                                 }).start();
                     }
                 });
+            } else {
+                cordovaWebView.getPluginManager().postMessage("updateSystemBars", null);
             }
+
         }
 
         private void attemptCloseOnPageFinished() {
@@ -525,6 +530,7 @@ public class SplashScreenPlugin extends CordovaPlugin {
                                         splashDialog = null;
                                         splashImageView = null;
                                     }
+                                    cordovaWebView.getPluginManager().postMessage("updateSystemBars", null);
                                 }
 
                                 @Override
@@ -536,6 +542,7 @@ public class SplashScreenPlugin extends CordovaPlugin {
                             splashDialog.dismiss();
                             splashDialog = null;
                             splashImageView = null;
+                            cordovaWebView.getPluginManager().postMessage("updateSystemBars", null);
                         }
                     }
                 }

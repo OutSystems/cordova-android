@@ -514,8 +514,10 @@ public class SplashScreenPlugin extends CordovaPlugin {
 
                             fadeOut.setAnimationListener(new Animation.AnimationListener() {
                                 @Override
-                                public void onAnimationStart(Animation animation) {
-                                    spinnerStop();
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    splashScreenViewProvider.remove();
+                                    webView.getPluginManager().postMessage("updateSystemBars", null);
                                 }
 
                                 @Override
@@ -689,6 +691,8 @@ public class SplashScreenPlugin extends CordovaPlugin {
                     }
                 }
             });
+        } else {
+            webView.getPluginManager().postMessage("updateSystemBars", null);
         }
     }
 }

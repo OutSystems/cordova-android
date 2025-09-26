@@ -31,7 +31,12 @@
       <!-- Required: Set the theme of the Activity that directly follows your splash screen. -->
       <item name="postSplashScreenTheme">@style/Theme.AppCompat.NoActionBar</item>
 
-      <!-- Disable Edge-to-Edge for SDK 35 -->
-      <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+        <!-- Disable Edge-to-Edge for SDK 35 -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+    </style>
+
+    <style name="Theme.Cordova.App.DayNight" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/cdv_background_color</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>

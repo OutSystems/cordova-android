@@ -290,10 +290,10 @@ describe('create', function () {
                 });
             });
 
-            it('should interpolate the project name with arabic chars into strings.xml', () => {
+            it('should interpolate the project name with arabic chars into cdv_strings.xml', () => {
                 config_mock.name.and.returnValue('غظضذخثتشرقصفعسنملكيطحزوهدبأ');
                 return create.create(project_path, config_mock, {}, events_mock).then(() => {
-                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'strings.xml'), /__NAME__/, 'غظضذخثتشرقصفعسنملكيطحزوهدبأ');
+                    expect(utils.replaceFileContents).toHaveBeenCalledWith(path.join(app_path, 'res', 'values', 'cdv_strings.xml'), /__NAME__/, 'غظضذخثتشرقصفعسنملكيطحزوهدبأ');
                 });
             });
 

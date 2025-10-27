@@ -54,7 +54,7 @@ Object.defineProperty(statusBar, 'setBackgroundColor', {
     enumerable: false,
     writable: false,
     value: function (value) {
-        var script = document.querySelector('script[src$="cordova.js"]');
+        var script = document.querySelector('script[src*="cordova.js"]');
         script.style.color = value;
         var rgbStr = window.getComputedStyle(script).getPropertyValue('color');
 

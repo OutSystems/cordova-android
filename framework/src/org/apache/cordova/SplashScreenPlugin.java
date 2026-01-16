@@ -45,11 +45,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.splashscreen.SplashScreenViewProvider;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -95,6 +93,8 @@ public class SplashScreenPlugin extends CordovaPlugin {
      */
     private int fadeDuration;
 
+    private static boolean hasCustomSplashscreens;
+
     // Internal variables
     /**
      * Boolean flag to determine if the splash screen remains visible.
@@ -125,7 +125,7 @@ public class SplashScreenPlugin extends CordovaPlugin {
 
         Context context = cordova.getContext();
         boolean showSpinner = preferences.getBoolean("ShowSplashScreenSpinner", DEFAULT_SHOW_SPINNER);
-        boolean hasCustomSplashscreens = preferences.getBoolean("HasCustomSplashscreens", DEFAULT_HAS_CUSTOM_SPLASHSCREENS);
+        hasCustomSplashscreens = preferences.getBoolean("HasCustomSplashscreens", DEFAULT_HAS_CUSTOM_SPLASHSCREENS);
         if (!showSpinner && !hasCustomSplashscreens) {
             // Use only the Android Splashscreen API
             behaviours.registerBehaviour(new AndroidSplashScreenBehaviour(context, autoHide, delayTime, isFadeEnabled, fadeDuration, webView));
@@ -329,7 +329,9 @@ public class SplashScreenPlugin extends CordovaPlugin {
                     }
                 });
             } else {
-                cordovaWebView.getPluginManager().postMessage("updateSystemBars", null);
+                if(!hasCustomSplashscreens){
+                    cordovaWebView.getPluginManager().postMessage("updateSystemBars", null);
+                }
             }
 
         }

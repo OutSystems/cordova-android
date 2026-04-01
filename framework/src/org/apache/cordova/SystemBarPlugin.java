@@ -50,6 +50,7 @@ public class SystemBarPlugin extends CordovaPlugin {
     private int overrideStatusBarBackgroundColor = INVALID_COLOR;
 
     private boolean canEdgeToEdge = false;
+    private String edgeToEdgeGlyphTheme = null;
 
     @Override
     protected void pluginInitialize() {
@@ -57,6 +58,7 @@ public class SystemBarPlugin extends CordovaPlugin {
         resources = context.getResources();
         canEdgeToEdge = preferences.getBoolean("AndroidEdgeToEdge", false)
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM;
+        edgeToEdgeGlyphTheme = preferences.getString("EdgeToEdgeGlyphTheme", null);
     }
 
     @Override
@@ -238,7 +240,10 @@ public class SystemBarPlugin extends CordovaPlugin {
 
         // Automatically set the font and icon color of the system bars based on background color.
         boolean isStatusBarBackgroundColorLight;
-        if(bgColor == Color.TRANSPARENT) {
+        if (canEdgeToEdge && edgeToEdgeGlyphTheme != null
+                && edgeToEdgeGlyphTheme.matches("(?i)(dark|light)")) {
+            isStatusBarBackgroundColorLight = edgeToEdgeGlyphTheme.equalsIgnoreCase("dark");
+        } else if(bgColor == Color.TRANSPARENT) {
             isStatusBarBackgroundColorLight = isColorLight(getUiModeColor());
         } else {
             isStatusBarBackgroundColorLight = isColorLight(bgColor);

@@ -50,12 +50,15 @@ public class SystemBarPlugin extends CordovaPlugin {
     private int overrideStatusBarBackgroundColor = INVALID_COLOR;
 
     private boolean canEdgeToEdge = false;
+    private String edgeToEdgeGlyphTheme = null;
 
     @Override
     protected void pluginInitialize() {
         context = cordova.getContext();
         resources = context.getResources();
         canEdgeToEdge = preferences.getBoolean("AndroidEdgeToEdge", false);
+        edgeToEdgeGlyphTheme = preferences.getString("EdgeToEdgeGlyphTheme", null);
+
     }
 
     @Override
@@ -236,8 +239,20 @@ public class SystemBarPlugin extends CordovaPlugin {
         }
 
         // Automatically set the font and icon color of the system bars based on background color.
+        // Determines whether to pass true to setAppearanceLightStatusBars().
+        // Despite what the official Android docs say, passing true results in DARK glyphs
+        // (suitable for light backgrounds) and passing false results in LIGHT glyphs
+        // (suitable for dark backgrounds).
+        //
+        // In edge-to-edge mode the nav bar background is transparent, so luminance-based
+        // detection doesn't work. The EdgeToEdgeGlyphTheme preference lets developers
+        // explicitly choose "dark" or "light" glyphs to match their app's background.
         boolean isStatusBarBackgroundColorLight;
-        if(bgColor == Color.TRANSPARENT) {
+        if (canEdgeToEdge && "dark".equalsIgnoreCase(edgeToEdgeGlyphTheme)) {
+            isStatusBarBackgroundColorLight = true;
+        } else if (canEdgeToEdge && "light".equalsIgnoreCase(edgeToEdgeGlyphTheme)) {
+            isStatusBarBackgroundColorLight = false;
+        } else if(bgColor == Color.TRANSPARENT) {
             isStatusBarBackgroundColorLight = isColorLight(getUiModeColor());
         } else {
             isStatusBarBackgroundColorLight = isColorLight(bgColor);

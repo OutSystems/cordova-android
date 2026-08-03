@@ -212,6 +212,7 @@ public class CordovaActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
+        webView.setFilterTouchesWhenObscured(preferences.getBoolean("FilterTouchesWhenObscured", true));
 
         // Create StatusBar view that will overlay the top inset
         View statusBarView = new View(this);

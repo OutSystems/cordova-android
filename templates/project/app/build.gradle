@@ -19,29 +19,21 @@
 
 apply plugin: 'com.android.application'
 
+// AGP >= 9 has built-in Kotlin support and fails the build if the standalone
+// 'kotlin-android' plugin is applied; the preference is kept only as a log line
+// so plugin.xml-injected preferences remain diagnosable in build logs.
 if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
-    apply plugin: 'kotlin-android'
+    println "GradlePluginKotlinEnabled is ignored: Kotlin support is built into AGP >= 9."
 }
 
 buildscript {
     apply from: '../CordovaLib/cordova.gradle'
-
-    // Checks if the kotlin version format is valid.
-    if(cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
-        if(!cdvHelpers.isVersionValid(cordovaConfig.KOTLIN_VERSION)) {
-            throw new GradleException("The defined Kotlin version (${cordovaConfig.KOTLIN_VERSION}) does not appear to be a valid version.")
-        }
-    }
 
     apply from: 'repositories.gradle'
     repositories repos
 
     dependencies {
         classpath "com.android.tools.build:gradle:${cordovaConfig.AGP_VERSION}"
-
-        if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
-            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${cordovaConfig.KOTLIN_VERSION}"
-        }
 
         if(cordovaConfig.IS_GRADLE_PLUGIN_GOOGLE_SERVICES_ENABLED) {
             // Checks if the kotlin version format is valid.
@@ -258,17 +250,6 @@ android {
         targetCompatibility JavaLanguageVersion.of(cordovaConfig.JAVA_TARGET_COMPATIBILITY)
     }
 
-    if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
-        // If KOTLIN_JVM_TARGET is null, fallback to JAVA_TARGET_COMPATIBILITY,
-        // as they generally should be equal
-        cordovaConfig.KOTLIN_JVM_TARGET = cordovaConfig.KOTLIN_JVM_TARGET ?:
-                cordovaConfig.JAVA_TARGET_COMPATIBILITY
-
-        kotlinOptions {
-            jvmTarget = JavaLanguageVersion.of(cordovaConfig.KOTLIN_JVM_TARGET)
-        }
-    }
-
     if (cdvReleaseSigningPropertiesFile) {
         signingConfigs {
             release {
@@ -307,10 +288,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     implementation "androidx.appcompat:appcompat:${cordovaConfig.ANDROIDX_APP_COMPAT_VERSION}"
     implementation "androidx.core:core-splashscreen:${cordovaConfig.ANDROIDX_CORE_SPLASHSCREEN_VERSION}"
-
-    if (cordovaConfig.IS_GRADLE_PLUGIN_KOTLIN_ENABLED) {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib:${cordovaConfig.KOTLIN_VERSION}"
-    }
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${cordovaConfig.KOTLIN_VERSION}") {

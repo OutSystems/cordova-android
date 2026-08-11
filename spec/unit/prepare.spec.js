@@ -885,7 +885,10 @@ describe('prepare', () => {
         it('runs without arguments', async () => {
             await expectAsync(
                 api.prepare(cordovaProject, options).then(() => {
-                    expect(gradlePropertiesParserSpy).toHaveBeenCalledWith({});
+                    expect(gradlePropertiesParserSpy).toHaveBeenCalledWith({
+                        'android.newDsl': 'false',
+                        'android.defaults.buildfeatures.resvalues': 'true'
+                    });
                 })
             ).toBeResolved();
         });
@@ -895,7 +898,9 @@ describe('prepare', () => {
             await expectAsync(
                 api.prepare(cordovaProject, options).then(() => {
                     expect(gradlePropertiesParserSpy).toHaveBeenCalledWith({
-                        'org.gradle.jvmargs': '-Xmx=4096m'
+                        'org.gradle.jvmargs': '-Xmx=4096m',
+                        'android.newDsl': 'false',
+                        'android.defaults.buildfeatures.resvalues': 'true'
                     });
                 })
             ).toBeResolved();

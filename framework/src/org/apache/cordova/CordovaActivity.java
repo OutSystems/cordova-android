@@ -39,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
@@ -107,6 +108,7 @@ public class CordovaActivity extends AppCompatActivity {
 
     private boolean canEdgeToEdge = false;
     private boolean isFullScreen = false;
+    private int densityDpi;
 
     /**
      * Called when the activity is first created.
@@ -156,6 +158,7 @@ public class CordovaActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
+        densityDpi = getResources().getConfiguration().densityDpi;
 
         cordovaInterface = makeCordovaInterface();
         if (savedInstanceState != null) {
@@ -563,6 +566,15 @@ public class CordovaActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (newConfig.densityDpi != densityDpi) {
+            densityDpi = newConfig.densityDpi;
+            // A density change drops the keyboard window but leaves the IME flagged as shown, so the
+            // IME inset keeps the WebView short. Hiding it resets the IME and the WebView fills the screen.
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+            }
+        }
         if (this.appView == null) {
             return;
         }
